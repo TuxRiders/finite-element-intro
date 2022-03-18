@@ -1,0 +1,67 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+
+\title{Weak formulation of the heat diffusion equation}
+\date{}
+
+\begin{document}
+\maketitle
+
+\onehalfspacing
+
+\begin{equation} \label{eq:pde_main}
+\frac{\partial T}{\partial t}=\nabla \cdot\left(k \nabla T\right))
+\end{equation}
+
+We define a space of test functions and then, multiply each term of the PDE by any arbitrary function as a member of this space:
+\begin{equation} \label{eq:function_space}
+\mathcal{V}=\left\{v(\mathbf{x}) | \mathbf{x} \in {\Omega}, v(\mathbf{x}) \in \mathcal{H}^{1}(\Omega), \text { and } v(\mathbf{x})=0 \text { on } \Gamma\right\}
+\end{equation}
+in which the $\Omega$ is the domain of interest, $\Gamma$ is the boundary of $\Omega$, and $\mathcal{H}^{1}$ denotes the Sobolev space of the domain $\Omega$, which is a space of functions whose derivatives are square-integrable functions in $\Omega$. The solution of the PDE belongs to a trial function space, which is similarly defined as:
+
+\begin{equation} \label{eq:trial_domain}
+\mathcal{S}_{t}=\left\{T(\mathbf{x}, t) | \mathbf{x} \in \Omega, t>0, T(\mathbf{x}, t) \in \mathcal{H}^{1}(\Omega), \text { and } \frac{\partial T}{\partial n}=0 \text { on } \Gamma\right\}
+\end{equation}
+
+We multiply Eq. \ref{eq:pde_main} to an arbitrary function $v \in \mathcal{V}$:
+
+\begin{equation}
+\frac{\partial T}{\partial t}v=\nabla \cdot\left(k \nabla T\right)v
+\end{equation}
+
+\noindent Integrating over the whole domain yields:
+\begin{equation} \label{eq:int_first}
+\int_{\Omega} \frac{\partial T}{\partial t} v d \omega=\int_{\Omega} \nabla \cdot (k  \nabla T) v d \omega
+\end{equation}
+
+\noindent The diffusion term can be split using the integration by parts technique:
+\begin{equation} \label{eq:int_part}
+\int_{\Omega} \nabla \cdot (k  \nabla T) v d \omega = \int_{\Omega} \nabla \cdot[v(k  \nabla T)] d \omega-\int_{\Omega} (\nabla v) \cdot(k  \nabla T) d \omega
+\end{equation}
+
+\noindent in which the second term can be converted to a surface integral on the domain boundary by applying the Green's divergence theory. The surface integral is zero because there is a no-flux boundary condition on the boundary of the computational domain (defined in the trial function space according to Eq. \ref{eq:trial_domain}):
+\begin{equation} \label{eq:divergence}
+\int_{\Omega} \nabla \cdot[v(k  \nabla T)] d \omega = \int_{\Gamma} k v \frac{\partial T}{\partial n} d \gamma=0
+\end{equation}
+
+\noindent For the temporal term, we use the finite difference method and apply a first-order backward Euler scheme for discretization, which makes it possible to solve the PDE implicitly:
+\begin{equation} \label{eq:backward}
+\frac{\partial T}{\partial t} = \frac{T-T^{n}}{\Delta t}
+\end{equation}
+\noindent where $T^n$ denotes the value of the state variable in the previous time step (or initial condition for the first time step). Inserting Eqs. \ref{eq:int_part}, \ref{eq:divergence}, and \ref{eq:backward} into Eq. \ref{eq:int_first} yields:
+\begin{equation}
+\int_{\Omega} \frac{T-T^{n}}{\Delta t} v d \omega=-\int_{\Omega} k  \nabla T \cdot \nabla v d \omega
+\end{equation}
+
+\noindent By reordering the equation, we get the weak form of Eq. \ref{eq:pde_main}:
+
+\begin{equation}  \label{eq:weak_general}
+\int_{\Omega} {T} v d \omega+\int_{\Omega} \Delta t k  \nabla T \cdot  \nabla v d \omega=\int_{\Omega} {T^{n}} v d \omega
+\end{equation}
+
+
+\end{document}
