@@ -1,0 +1,40 @@
+load "msh3"
+load "iovtk"
+
+func k = 5000.0;
+real tEnd = 20.;
+real dt = 0.1;
+real u0 = 0;
+real uIn = 20;
+real uOut = -20;
+
+// Mesh
+mesh3 Mesh = readmesh3("helix.mesh");
+
+// Fespace
+fespace SpaceP1(Mesh, P1);
+SpaceP1 u = u0, v, uold;
+
+// Problem
+problem thermic(u, v)
+    = int3d(Mesh)(
+          u*v/dt
+        + k*(dx(u)*dx(v) + dy(u)*dy(v) + dz(u)*dz(v))
+    )
+    - int3d(Mesh)(
+          uold*v/dt
+    )
+    + on(12, u=uIn);
+    // + on(10, u=uOut);
+
+int count = 0;
+
+// Time iterations
+for(real t = 0; t < tEnd; t += dt)
+{
+    uold = u;
+    thermic;
+    if (count % 3 == 0)
+      savevtk("output/output-"+count+".vtu", Mesh, u);
+    count++;
+}
